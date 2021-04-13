@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "kesha"
+name = "django-kesha"
 version = "0.1.0"
 description = "Accounting Helper Django App"
 authors = ["Florian Rämisch <olf@subsignal.org>"]
