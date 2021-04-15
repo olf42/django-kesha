@@ -41,6 +41,7 @@ class Account(CreatedModifiedModel, SlugifiedModel):
         blank=True,
         related_name="child_accounts",
     )
+    virtual = models.BooleanField(default=False)
 
     class Meta:
         unique_together = [["name", "parent"]]
@@ -82,6 +83,7 @@ class Entry(CreatedModifiedModel):
     text = models.TextField()
     debit = MoneyField(max_digits=14, decimal_places=2, default_currency="EUR")
     credit = MoneyField(max_digits=14, decimal_places=2, default_currency="EUR")
+    virtual = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         if self.done:
