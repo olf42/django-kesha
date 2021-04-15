@@ -5,6 +5,10 @@ description = "Accounting Helper Django App"
 authors = ["Florian Rämisch <olf@subsignal.org>"]
 license = "GPL-3.0"
 
+packages = [
+    { include="kesha", from="." },
+]
+
 [tool.poetry.dependencies]
 python = "^3.9"
 django-afa = {git = "https://github.com/olf42/django-afa.git", rev = "main"}
