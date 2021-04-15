@@ -1,4 +1,6 @@
+from decimal import Decimal
 from django.db import models
+from django.db.models import Sum
 from django.utils.text import slugify
 from djmoney.models.fields import MoneyField
 
@@ -60,6 +62,20 @@ class Booking(CreatedModifiedModel):
         super().__init__(*args, **kwargs)
         self.__done = self.done
 
+    @property
+    def debit(self):
+        return self.get_entry_sum("debit")
+
+    @property
+    def credit(self):
+        return self.get_entry_sum("credit")
+
+    def get_entry_sum(self, column):
+        value = Entry.objects.filter(booking=self, virtual=False).aggregate(
+            Sum(column)
+        )[f"{column}__sum"]
+        return value if value is not None else Decimal(0.0)
+
     def save(self, force_insert=False, force_update=False, *args, **kwargs):
         if self.done and self.done == self.__done:
             raise ModelDoneError("Models marked as done can not be edited anymore.")
@@ -81,9 +97,24 @@ class Entry(CreatedModifiedModel):
         "Booking", on_delete=models.PROTECT, related_name="entries"
     )
     text = models.TextField()
-    debit = MoneyField(max_digits=14, decimal_places=2, default_currency="EUR")
-    credit = MoneyField(max_digits=14, decimal_places=2, default_currency="EUR")
+    debit = MoneyField(
+        max_digits=14, decimal_places=2, default_currency="EUR", null=True, blank=True
+    )
+    credit = MoneyField(
+        max_digits=14, decimal_places=2, default_currency="EUR", null=True, blank=True
+    )
     virtual = models.BooleanField(default=False)
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                name="%(app_label)s_%(class)s_either_debit_or_credit",
+                check=(
+                    models.Q(debit__isnull=True, credit__isnull=False)
+                    | models.Q(debit__isnull=False, credit__isnull=True)
+                ),
+            )
+        ]
 
     def save(self, *args, **kwargs):
         if self.done:
