@@ -1,21 +1,20 @@
 from decimal import Decimal
 from django.db.utils import IntegrityError
 from django.test import TestCase
-from kesha.models import Booking, Entry, Account, Parent, ModelDoneError
+from kesha.models import Entry, ModelDoneError
 from djmoney.money import Money
+from kesha.tests.factories import (
+    ActiveParentFactory,
+    ActiveAccountFactory,
+    BookingFactory,
+)
 
 
 class KeshaCreateCase(TestCase):
     def setUp(self):
-        self.p = Parent.objects.create(name="Bank Accounts", active=True)
-        self.a = Account.objects.create(name="Bank Account 1", parent=self.p)
-        self.b = Booking.objects.create()
-        self.e = Entry.objects.create(
-            account=self.a,
-            booking=self.b,
-            debit=Money(100.00, "EUR"),
-            text="Testbuchung",
-        )
+        self.p = ActiveParentFactory()
+        self.a = ActiveAccountFactory()
+        self.b = BookingFactory()
 
     def test_entry(self):
         """Test if an entry can have both filled debit and credit (shouldn't be possible)."""
@@ -39,34 +38,22 @@ class KeshaCreateCase(TestCase):
         """Tests if entries of a booking, which is marked as done, can be changed."""
         self.b.done = True
         self.b.save()
-        self.e.text = "Testbuchung2"
-        self.assertRaises(ModelDoneError, self.e.save)
+        e = self.b.entries.all()[0]
+        e.text = e.text + "update"
+        self.assertRaises(ModelDoneError, e.save)
 
     def test_booking_sum(self):
-        a2 = Account.objects.create(name="Bank Account 2", parent=self.p)
-        a3 = Account.objects.create(name="Bank Account 3", parent=self.p)
-        b2 = Booking.objects.create()
+        """
+        Creates a good booking (i.e. the sum of the entries debit = sum of entries credit.
+        Also virtual entries are not accounted for.
+        """
+        b = BookingFactory(good=True)
         Entry.objects.create(
-            account=a2,
-            booking=self.b,
-            credit=Money(123.45, "EUR"),
-            text="Testbuchung",
-        )
-        Entry.objects.create(
-            account=a3,
-            booking=self.b,
-            debit=Money(123.45, "EUR"),
-            text="Testbuchung",
-            virtual=True,
-        )
-        Entry.objects.create(
-            account=a3,
-            booking=b2,
+            account=ActiveAccountFactory(),
+            booking=b,
             credit=Money(100.00, "EUR"),
             text="Testbuchung",
             virtual=True,
         )
-        self.assertEquals(self.b.debit, Decimal("100.00"))
-        self.assertEquals(self.b.credit, Decimal("123.45"))
-        self.assertEquals(b2.debit, 0)
-        self.assertEquals(b2.credit, 0)
+        self.assertEquals(b.debit, Decimal("100.00"))
+        self.assertEquals(b.credit, Decimal("100.00"))
