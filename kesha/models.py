@@ -1,12 +1,17 @@
 from decimal import Decimal
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Sum
 from django.utils.text import slugify
+from django.utils.translation import gettext as _
 from djmoney.models.fields import MoneyField
+
+MODEL_DONE_ERROR_MSG = _("Models marked as done can not be edited anymore.")
 
 
 class ModelDoneError(Exception):
-    pass
+    def __init__(self, msg=MODEL_DONE_ERROR_MSG, *args, **kwargs):
+        super().__init__(msg, *args, **kwargs)
 
 
 class CreatedModifiedModel(models.Model):
@@ -76,17 +81,27 @@ class Booking(CreatedModifiedModel):
         )[f"{column}__sum"]
         return value if value is not None else Decimal(0.0)
 
+    @property
+    def entry_sums_match(self):
+        return self.get_entry_sum("debit") == self.get_entry_sum("credit")
+
     def save(self, force_insert=False, force_update=False, *args, **kwargs):
         if self.done and self.done == self.__done:
-            raise ModelDoneError("Models marked as done can not be edited anymore.")
+            raise ModelDoneError()
         elif self.done and self.done != self.__done:
-            super().save(force_insert, force_update, *args, **kwargs)
+            if not self.entry_sums_match:
+                self.done = False
+                raise ValidationError(
+                    _(f"Entry sums do not match up Debit {self.debit} != {self.credit}")
+                )
+            else:
+                super().save(force_insert, force_update, *args, **kwargs)
             self.__done = self.done
         elif not self.done and self.done == self.__done:
             super().save(force_insert, force_update, *args, **kwargs)
             self.__done = self.done
         elif not self.done and self.done != self.__done:
-            raise ModelDoneError("Models marked as done can not be edited anymore.")
+            raise ModelDoneError()
 
 
 class Entry(CreatedModifiedModel):
@@ -118,7 +133,7 @@ class Entry(CreatedModifiedModel):
 
     def save(self, *args, **kwargs):
         if self.done:
-            raise ModelDoneError("Models marked as done can not be edited anymore.")
+            raise ModelDoneError()
         else:
             super().save(*args, **kwargs)
 

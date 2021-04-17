@@ -1,4 +1,5 @@
 from decimal import Decimal
+from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
 from django.test import TestCase
 from kesha.models import Entry, ModelDoneError
@@ -10,11 +11,11 @@ from kesha.tests.factories import (
 )
 
 
-class KeshaCreateCase(TestCase):
+class KeshaTestCase(TestCase):
     def setUp(self):
         self.p = ActiveParentFactory()
         self.a = ActiveAccountFactory()
-        self.b = BookingFactory()
+        self.b = BookingFactory(good=True)
 
     def test_entry(self):
         """Test if an entry can have both filled debit and credit (shouldn't be possible)."""
@@ -33,6 +34,11 @@ class KeshaCreateCase(TestCase):
         self.b.save()
         self.b.done = False
         self.assertRaises(ModelDoneError, self.b.save)
+
+    def test_booking_done_with_unequal_entries(self):
+        b = BookingFactory()
+        b.done = True
+        self.assertRaises(ValidationError, b.save)
 
     def test_entry_of_done_booking_not_editable(self):
         """Tests if entries of a booking, which is marked as done, can be changed."""
