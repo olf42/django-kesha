@@ -58,10 +58,28 @@ class Account(CreatedModifiedModel, SlugifiedModel):
         return self.parent.active
 
 
+class BookingManager(models.Manager):
+    def bulk_import(self, entries, account):
+        """
+        Bulk imports entries and create a new booking for each entry.
+        ":param entries: Entries to be imported (list of dicts)
+        """
+        bookings = []
+        for entry in entries:
+            booking = self.create()
+            entry["account"] = account
+            entry["booking"] = booking
+            entry = Entry.objects.create(**entry)
+            bookings.append(booking)
+        return bookings
+
+
 class Booking(CreatedModifiedModel):
     done = models.BooleanField(default=False)
 
     __done = None
+
+    objects = BookingManager()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

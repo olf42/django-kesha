@@ -1,0 +1,6 @@
+- debit: 123.45
+  text: "Peter Müller: Rechnung 1234"
+- debit: 123.45
+  text: "Aiten Seker: Rechnung 1235"
+- credit: 1000.00
+  text: "Immo Biehl: Miete April 2021"
