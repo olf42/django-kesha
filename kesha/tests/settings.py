@@ -2,6 +2,7 @@ USE_TZ = False
 SECRET_KEY = "fake_key_for_testing"
 INSTALLED_APPS = [
     "djmoney",
+    "doma",
     "kesha",
     "kesha.tests",
 ]

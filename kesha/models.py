@@ -76,6 +76,13 @@ class BookingManager(models.Manager):
 
 class Booking(CreatedModifiedModel):
     done = models.BooleanField(default=False)
+    document = models.ForeignKey(
+        "doma.Document",
+        on_delete=models.PROTECT,
+        related_name="booking",
+        null=True,
+        blank=True,
+    )
 
     __done = None
 
