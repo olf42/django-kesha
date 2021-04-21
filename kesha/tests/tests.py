@@ -24,7 +24,6 @@ class KeshaTestCase(TestCase):
             booking=self.b,
             debit=Money(10.00, "EUR"),
             credit=Money(10.00, "EUR"),
-            text="Testbuchung",
         )
         self.assertRaises(IntegrityError, e.save)
 
@@ -45,7 +44,8 @@ class KeshaTestCase(TestCase):
         self.b.done = True
         self.b.save()
         e = self.b.entries.all()[0]
-        e.text = e.text + "update"
+        print(e.credit)
+        e.credit = Money(123.00, "EUR")
         self.assertRaises(ModelDoneError, e.save)
 
     def test_booking_sum(self):
@@ -58,8 +58,11 @@ class KeshaTestCase(TestCase):
             account=ActiveAccountFactory(),
             booking=b,
             credit=Money(100.00, "EUR"),
-            text="Testbuchung",
             virtual=True,
         )
         self.assertEqual(b.debit, Decimal("100.00"))
         self.assertEqual(b.credit, Decimal("100.00"))
+
+    def test_account_sum(self):
+        b = BookingFactory()
+        self.assertEqual(b.entries.get().account.debit, Decimal("100"))

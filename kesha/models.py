@@ -57,6 +57,20 @@ class Account(CreatedModifiedModel, SlugifiedModel):
     def active(self):
         return self.parent.active
 
+    @property
+    def debit(self):
+        return self.get_entry_sum("debit")
+
+    @property
+    def credit(self):
+        return self.get_entry_sum("credit")
+
+    def get_entry_sum(self, column):
+        value = Entry.objects.filter(account=self, virtual=self.virtual).aggregate(
+            Sum(column)
+        )[f"{column}__sum"]
+        return value if value is not None else Decimal(0.0)
+
 
 class BookingManager(models.Manager):
     def bulk_import(self, entries, account):
@@ -76,6 +90,7 @@ class BookingManager(models.Manager):
 
 class Booking(CreatedModifiedModel):
     done = models.BooleanField(default=False)
+    text = models.TextField()
     document = models.ForeignKey(
         "doma.Document",
         on_delete=models.PROTECT,
@@ -136,7 +151,6 @@ class Entry(CreatedModifiedModel):
     booking = models.ForeignKey(
         "Booking", on_delete=models.PROTECT, related_name="entries"
     )
-    text = models.TextField()
     debit = MoneyField(
         max_digits=14, decimal_places=2, default_currency="EUR", null=True, blank=True
     )

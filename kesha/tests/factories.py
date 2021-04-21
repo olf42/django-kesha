@@ -46,7 +46,6 @@ class EntryFactory(factory.django.DjangoModelFactory):
         model = Entry
 
     account = factory.SubFactory(ActiveAccountFactory)
-    text = "".join(random.choices(string.ascii_letters, k=20))
     virtual = False
 
 
@@ -54,6 +53,7 @@ class BookingFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Booking
 
+    text = "Booking Text".join(random.choices(string.ascii_letters, k=20))
     entry_1 = factory.RelatedFactory(
         EntryFactory, factory_related_name="booking", debit=Money("100.0", "EUR")
     )
