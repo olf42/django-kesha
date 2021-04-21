@@ -61,5 +61,5 @@ class KeshaTestCase(TestCase):
             text="Testbuchung",
             virtual=True,
         )
-        self.assertEquals(b.debit, Decimal("100.00"))
-        self.assertEquals(b.credit, Decimal("100.00"))
+        self.assertEqual(b.debit, Decimal("100.00"))
+        self.assertEqual(b.credit, Decimal("100.00"))
