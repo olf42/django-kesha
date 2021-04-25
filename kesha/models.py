@@ -88,16 +88,22 @@ class BookingManager(models.Manager):
         return bookings
 
 
-class Booking(CreatedModifiedModel):
-    done = models.BooleanField(default=False)
-    text = models.TextField()
+class BookingDocument(models.Model):
+    booking = models.ForeignKey(
+        "Booking",
+        on_delete=models.PROTECT,
+        related_name="documents",
+    )
     document = models.ForeignKey(
         "doma.Document",
         on_delete=models.PROTECT,
-        related_name="booking",
-        null=True,
-        blank=True,
+        related_name="bookings",
     )
+
+
+class Booking(CreatedModifiedModel):
+    done = models.BooleanField(default=False)
+    text = models.TextField()
 
     __done = None
 
