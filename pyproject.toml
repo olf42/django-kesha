@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "django-kesha"
-version = "0.1.0"
+version = "0.1.1"
 description = "Accounting Helper Django App"
 authors = ["Florian Rämisch <olf@subsignal.org>"]
 license = "GPL-3.0"
