@@ -3,7 +3,34 @@
 kesha is an accounting helper for django.
 It provides the necessary models and view and is ready to be included into your project.
 
-Detailed documentation is in the "docs" directory.
+![django_kesha_logo](assets/django-kesha-logo.png?raw=true "django-kesha-logo")
+
+## Idea
+
+I need an accounting tool, but I don't like Gnucash. I want to link documents to each booking,
+and the whole thing should be somewhat auditproof. I could not find any tool that suits these
+needs, therefore I started writing my own tools. Previously I worked on [kescher](https://github.com/westnetz/kescher) which is the proof of concept for this application. It has some major flaws, (e.g. i does not calculate correctly) but this will be fixed with this app.
+
+## Features
+
+_Django-doma_ currently provides some models which are ready to be used in our application
+
+* Document model to store documents
+* DocumentType to group/order documents
+
+Documents will become readonly after a while, this helps storing your documents audit-proof.
+Once readonly, Documents can not be deleted, but only "replaced", i.e. an updated version is 
+linked, but the original is kept in place (as a sort of version control).
+
+## Related apps
+
+* [django-doma](https://github.com/olf42/django-doma) - Simple Document Management App
+* [django-afa](https://github.com/olf42/django-afa) - Aufwendungen für Abschreibungen Helper
+
+Tested with the following versions of Python/Django:
+
+* Django: 2.2, 3.0, 3.1, 3.2
+* Python: 3.7, 3.8, 3.9
 
 ## Installation
 
