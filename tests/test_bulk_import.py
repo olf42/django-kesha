@@ -3,7 +3,7 @@ import yaml
 from djmoney.money import Money
 from django.test import TestCase
 from kesha.models import Booking
-from kesha.tests.factories import ActiveParentFactory, ActiveAccountFactory
+from tests.factories import ActiveParentFactory, ActiveAccountFactory
 from pathlib import Path
 
 ENTRIES_FILENAME = Path(__file__).parent / "entries.yaml"

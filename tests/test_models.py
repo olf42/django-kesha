@@ -4,7 +4,7 @@ from django.db.utils import IntegrityError
 from django.test import TestCase
 from kesha.models import Entry, ModelDoneError
 from djmoney.money import Money
-from kesha.tests.factories import (
+from tests.factories import (
     ActiveParentFactory,
     ActiveAccountFactory,
     BookingFactory,

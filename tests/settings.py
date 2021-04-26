@@ -4,7 +4,7 @@ INSTALLED_APPS = [
     "djmoney",
     "doma",
     "kesha",
-    "kesha.tests",
+    "tests",
 ]
 DATABASES = dict(
     default=dict(
