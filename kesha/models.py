@@ -81,6 +81,7 @@ class BookingManager(models.Manager):
         bookings = []
         for entry in entries:
             booking = self.create()
+            booking.text = entry.pop("text")
             entry["account"] = account
             entry["booking"] = booking
             entry = Entry.objects.create(**entry)

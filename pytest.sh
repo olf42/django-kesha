@@ -1,2 +1,2 @@
 #!/bin/bash
-pytest --cov=./kesha kesha/tests/tests.py
+pytest --cov=./kesha

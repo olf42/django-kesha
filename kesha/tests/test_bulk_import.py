@@ -22,12 +22,13 @@ class BulkImportTestCase(TestCase):
 
     def test_bulk_import(self):
         entries = get_entries()
+        entry_texts = [entry["text"] for entry in entries]
         bookings = Booking.objects.bulk_import(entries, self.a)
         self.assertEqual(len(entries), len(bookings))
-        for entry, booking in zip(entries, bookings):
+        for entry, booking, entry_text in zip(entries, bookings, entry_texts):
             self.assertEqual(len(booking.entries.all()), 1)
             b_entry = booking.entries.get()
-            self.assertEqual(entry["text"], b_entry.text)
+            self.assertEqual(entry_text, booking.text)
             if "debit" in entry.keys():
                 self.assertEqual(Money(entry["debit"], CUR), b_entry.debit)
             else:
