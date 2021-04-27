@@ -66,3 +66,14 @@ class KeshaTestCase(TestCase):
     def test_account_sum(self):
         b = BookingFactory()
         self.assertEqual(b.entries.get().account.debit, Decimal("100"))
+
+    def test_parent_sum(self):
+        """
+        The good booking self.b consist of two entries onto two different accounts.
+        Both of which have different parents, and therefore the same sum on either
+        debit or credit.
+        """
+        parent_1 = self.b.entries.all()[0].account.parent
+        parent_2 = self.b.entries.all()[1].account.parent
+        self.assertEqual(parent_1.debit, Decimal(100.0))
+        self.assertEqual(parent_2.credit, Decimal(100.0))

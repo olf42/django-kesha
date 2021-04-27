@@ -37,6 +37,37 @@ class SlugifiedModel(models.Model):
 class Parent(CreatedModifiedModel, SlugifiedModel):
     name = models.CharField(max_length=255)
     active = models.BooleanField()
+    parent = models.ForeignKey(
+        "Parent",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="child_parents",
+    )
+
+    def save(self, *args, **kwargs):
+        if self.parent:
+            self.active = self.parent.active
+        super().save(*args, **kwargs)
+
+    @property
+    def debit(self):
+        return self.get_sum("debit")
+
+    @property
+    def credit(self):
+        return self.get_sum("credit")
+
+    def get_sum(self, column):
+        """Returns the sum of direct child accounts and child parents."""
+        account_sum = Entry.objects.filter(
+            account__parent=self, virtual=False
+        ).aggregate(Sum(column))[f"{column}__sum"]
+        account_sum = account_sum if account_sum is not None else Decimal(0.0)
+        parent_sum = sum([p.get_sum() for p in Parent.objects.filter(parent=self)])
+        parent_sum = parent_sum if parent_sum is not None else Decimal(0.0)
+        value = account_sum + parent_sum
+        return value if value is not None else Decimal(0.0)
 
 
 class Account(CreatedModifiedModel, SlugifiedModel):
