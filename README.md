@@ -13,14 +13,7 @@ needs, therefore I started writing my own tools. Previously I worked on [kescher
 
 ## Features
 
-_Django-doma_ currently provides some models which are ready to be used in our application
-
-* Document model to store documents
-* DocumentType to group/order documents
-
-Documents will become readonly after a while, this helps storing your documents audit-proof.
-Once readonly, Documents can not be deleted, but only "replaced", i.e. an updated version is 
-linked, but the original is kept in place (as a sort of version control).
+_Django-kesha_ currently provides some basic accounting functionality. 
 
 ## Related apps
 
