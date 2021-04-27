@@ -77,3 +77,16 @@ class KeshaTestCase(TestCase):
         parent_2 = self.b.entries.all()[1].account.parent
         self.assertEqual(parent_1.debit, Decimal(100.0))
         self.assertEqual(parent_2.credit, Decimal(100.0))
+
+    def test_parent_recurse(self):
+        """Tests if sums from child parents are correctly displayed for the parents"""
+        parent_1 = self.b.entries.all()[0].account.parent
+        parent_2 = self.b.entries.all()[1].account.parent
+        p1 = ActiveParentFactory()
+        p2 = ActiveParentFactory()
+        parent_1.parent = p1
+        parent_1.save()
+        parent_2.parent = p2
+        parent_2.save()
+        self.assertEqual(p1.debit, Decimal(100.0))
+        self.assertEqual(p2.credit, Decimal(100.0))

@@ -45,6 +45,9 @@ class Parent(CreatedModifiedModel, SlugifiedModel):
         related_name="child_parents",
     )
 
+    def __str__(self):
+        return self.name
+
     def save(self, *args, **kwargs):
         if self.parent:
             self.active = self.parent.active
@@ -60,14 +63,15 @@ class Parent(CreatedModifiedModel, SlugifiedModel):
 
     def get_sum(self, column):
         """Returns the sum of direct child accounts and child parents."""
+        print(self)
         account_sum = Entry.objects.filter(
             account__parent=self, virtual=False
         ).aggregate(Sum(column))[f"{column}__sum"]
         account_sum = account_sum if account_sum is not None else Decimal(0.0)
-        parent_sum = sum([p.get_sum() for p in Parent.objects.filter(parent=self)])
+        parent_sum = sum([p.get_sum(column) for p in self.child_parents.all()])
         parent_sum = parent_sum if parent_sum is not None else Decimal(0.0)
         value = account_sum + parent_sum
-        return value if value is not None else Decimal(0.0)
+        return value
 
 
 class Account(CreatedModifiedModel, SlugifiedModel):
