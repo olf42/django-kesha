@@ -34,6 +34,11 @@ class SlugifiedModel(models.Model):
         super().save(*args, **kwargs)
 
 
+class ParentManager(models.Manager):
+    def get_roots(self):
+        return Parent.objects.filter(parent=None)
+
+
 class Parent(CreatedModifiedModel, SlugifiedModel):
     name = models.CharField(max_length=255)
     active = models.BooleanField()
@@ -44,6 +49,10 @@ class Parent(CreatedModifiedModel, SlugifiedModel):
         blank=True,
         related_name="child_parents",
     )
+    objects = ParentManager()
+
+    class Meta:
+        ordering = ["name", "active"]
 
     def __str__(self):
         return self.name
@@ -78,8 +87,6 @@ class Account(CreatedModifiedModel, SlugifiedModel):
     parent = models.ForeignKey(
         "Parent",
         on_delete=models.PROTECT,
-        null=True,
-        blank=True,
         related_name="child_accounts",
     )
     virtual = models.BooleanField(default=False)

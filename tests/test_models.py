@@ -2,7 +2,7 @@ from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
 from django.test import TestCase
-from kesha.models import Entry, ModelDoneError
+from kesha.models import Entry, Parent, ModelDoneError
 from djmoney.money import Money
 from tests.factories import (
     ActiveParentFactory,
@@ -90,3 +90,32 @@ class KeshaTestCase(TestCase):
         parent_2.save()
         self.assertEqual(p1.debit, Decimal(100.0))
         self.assertEqual(p2.credit, Decimal(100.0))
+
+    def test_get_roots(self):
+        root_nodes = Parent.objects.get_roots()
+        expectations = [
+            {
+                "name": "Active Parent 031",
+                "debit": Decimal("0.0"),
+                "credit": Decimal("0.0"),
+            },
+            {
+                "name": "Active Parent 032",
+                "debit": Decimal("0.0"),
+                "credit": Decimal("0.0"),
+            },
+            {
+                "name": "Active Parent 033",
+                "debit": Decimal("100.0"),
+                "credit": Decimal("0.0"),
+            },
+            {
+                "name": "Active Parent 034",
+                "debit": Decimal("0.0"),
+                "credit": Decimal("100.0"),
+            },
+        ]
+        for node, exp in zip(root_nodes, expectations):
+            self.assertEqual(node.name, exp["name"])
+            self.assertEqual(node.debit, exp["debit"])
+            self.assertEqual(node.credit, exp["credit"])
