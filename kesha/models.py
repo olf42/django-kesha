@@ -63,7 +63,6 @@ class Parent(CreatedModifiedModel, SlugifiedModel):
 
     def get_sum(self, column):
         """Returns the sum of direct child accounts and child parents."""
-        print(self)
         account_sum = Entry.objects.filter(
             account__parent=self, virtual=False
         ).aggregate(Sum(column))[f"{column}__sum"]
