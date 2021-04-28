@@ -66,6 +66,7 @@ class KeshaTestCase(TestCase):
     def test_account_sum(self):
         b = BookingFactory()
         self.assertEqual(b.entries.get().account.debit, Decimal("100"))
+        self.assertEqual(b.entries.get().account.credit, Decimal("0.0"))
 
     def test_parent_sum(self):
         """
