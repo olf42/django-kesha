@@ -11,7 +11,7 @@ class ActiveParentFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Parent
 
-    name = factory.Sequence(lambda n: "Active Parent %03d" % n)
+    name = factory.Sequence(lambda n: f"Active Parent {n:03d}")
     active = True
 
 
@@ -19,7 +19,7 @@ class PassiveParentFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Parent
 
-    name = factory.Sequence(lambda n: "Passive Parent %03d" % n)
+    name = factory.Sequence(lambda n: f"Passive Parent {n:03d}")
     active = False
 
 
@@ -27,7 +27,7 @@ class ActiveAccountFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Account
 
-    name = factory.Sequence(lambda n: "Account %03d" % n)
+    name = factory.Sequence(lambda n: f"Account {n:03d}")
     parent = factory.SubFactory(ActiveParentFactory)
     virtual = False
 
@@ -36,7 +36,7 @@ class PassiveActiveAccountFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Account
 
-    name = factory.Sequence(lambda n: "Account %03d" % n)
+    name = factory.Sequence(lambda n: f"Account {n:03d}")
     parent = factory.SubFactory(PassiveParentFactory)
     virtual = False
 
